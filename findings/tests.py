@@ -47,7 +47,7 @@ class FindingTests(BaseCase):
         self.client.force_login(self.analyst)
         response = self.client.post(reverse("finding_add"), self.data())
         self.assertRedirects(response, reverse("finding_list"))
-        self.assertEqual(Finding.objects.get().title, "Cache poisoned")
+        self.assertEqual(Finding.objects.get().title, "Wrong title")
 
     def test_tc04_close_finding(self):
         self.client.force_login(self.analyst)
