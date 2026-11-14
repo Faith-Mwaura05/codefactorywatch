@@ -1,0 +1,41 @@
+version: 2.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: pip install -r requirements.txt
+      - run:
+          name: System check
+          command: python manage.py check
+      - run:
+          name: Run unit tests
+          command: python manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner
+      - store_test_results:
+          path: test-results
+
+  package:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      - run:
+          name: Create release archive
+          command: mkdir -p artifacts && tar --exclude=.git --exclude=artifacts -czf artifacts/codefactorywatch.tar.gz .
+      - store_artifacts:
+          path: artifacts
+
+workflows:
+  main:
+    jobs:
+      - build-and-test
+      - package:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: main
